@@ -4,56 +4,41 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import { useDebounce } from 'react-use';
 
-const API_BASE_URL = 'https://collectionapi.metmuseum.org/public/collection/v1';
+const API_BASE_URL = "https://api.artic.edu/api/v1/artworks";
 
 function App() {
   const [searchQueryDebounced, setSearchQueryDebounced] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [errorState, setErrorState] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  useDebounce(() => setSearchQueryDebounced(searchQuery), 750, [searchQuery]);
+  useDebounce(() => setSearchQueryDebounced(searchQuery), 640, [searchQuery]);
 
   const fetchArts = async (query) => {
     setLoading(true);
-    setErrorState(false);
+    setErrorMessage('');
+    setResults([]);
 
     try {
-      const endpoint = query ? `${API_BASE_URL}/search?q=${query}` : `${API_BASE_URL}/search?departmentId=11&q=*`;
+      const endpoint = query ? `${API_BASE_URL}/search?q=${encodeURIComponent(query)}&limit=10&fields=id,title,image_id` : API_BASE_URL;
 
       const response = await fetch(endpoint);
 
       if (!response.ok) {
-        throw new Error('Failed to fetch movies');
+        throw new Error('Failed to fetch arts');
       }
 
       const data = await response.json();
 
-      if (data.objectIDs?.length > 0) {
-        const ids = data.objectIDs.slice(0, 20);
-        const detailPromises = ids.map((id) =>
-          fetch(`${API_BASE_URL}/objects/${id}`).then((res) => {
-            return res.json();
-          })
-        );
-
-        // const artworks = await Promise.all(detailPromises);
-        const results = await Promise.allSettled(detailPromises);
-        const artworks = results
-        .filter(result => result.status === "fulfilled")
-        .map(result => result.value)
-        .filter(art => art.primaryImageSmall);
-
-        console.log(artworks);
-
-        setResults(artworks || []);
-      } else {
-        setResults([]);
+      if(data.data.length < 1) {
+        throw new Error('No arts we\'re found');
       }
+
+      setResults(data.data || []);
     } catch (error) {
       console.error("Error fetching artworks:", error);
-      setErrorState(true);
+      setErrorMessage(error.message || "Failed to fetch arts!");
     }
 
     setLoading(false);
@@ -76,24 +61,27 @@ function App() {
         />
       </div>
 
-      {loading ? <p className="max-w-4xl mx-auto">Loading...</p> : errorState ? (
-        <h1>Did not fetch any arts!</h1>
-      ): (
+      {loading ? <p className="max-w-4xl mx-auto">Loading...</p> : errorMessage ? (
+        <h1 className='text-red-300'>{errorMessage}</h1>
+      ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
-        {results.map((art) => (
-          <div key={art.objectID}>
-            <img
-              src={art.primaryImageSmall}
-              alt={art.title}
-              className="w-full h-48 object-cover rounded"
-            />
-            <p className="mt-2 text-gray-600 text-sm font-medium">{art.title}</p>
-            <p className="text-xs text-gray-600">{art.artistDisplayName}</p>
-          </div>
-        ))}
-      </div>
-      ) }
-      
+          {results.map((art) => (
+            <div key={art.id} style={{ border: "1px solid #ddd", padding: "0.5rem" }}>
+              <h3 style={{ fontSize: "1rem" }}>{art.title}</h3>
+              {art.image_id ? (
+                <img
+                  src={`https://www.artic.edu/iiif/2/${art.image_id}/full/843,/0/default.jpg`}
+                  alt={art.title}
+                  style={{ width: "100%", height: "auto" }}
+                />
+              ) : (
+                <p>No image available</p>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
     </div>
   );
 }
