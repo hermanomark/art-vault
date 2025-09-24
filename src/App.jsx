@@ -22,7 +22,11 @@ const Mediums = [
   'Crayons',
   'Gold',
   'Silver'
-]
+];
+
+// const Mediums = [
+
+// ]
 
 function App() {
   const [searchQueryDebounced, setSearchQueryDebounced] = useState('');
@@ -30,16 +34,21 @@ function App() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [activeMedium, setActiveMedium] = useState('');
 
   useDebounce(() => setSearchQueryDebounced(searchQuery), 640, [searchQuery]);
 
-  const fetchArts = async (query) => {
+  const fetchArts = async (query = '', isMedium = false) => {
     setLoading(true);
     setErrorMessage('');
     setResults([]);
+    
+    if(!isMedium) {
+      setActiveMedium('');
+    }
 
     try {
-      const endpoint = query ? `${API_BASE_URL}/search?q=${encodeURIComponent(query)}&limit=10&fields=id,title,image_id` : API_BASE_URL;
+      let endpoint = query ? `${API_BASE_URL}/search?q=${encodeURIComponent(query)}&limit=10&fields=id,title,image_id` : `${API_BASE_URL}`;
 
       const response = await fetch(endpoint);
 
@@ -53,7 +62,9 @@ function App() {
         throw new Error('No arts we\'re found');
       }
 
-      setResults(data.data || []);
+      const filterDataByImage = (data.data).filter(art => art.image_id);
+
+      setResults(filterDataByImage|| []);
     } catch (error) {
       console.error('Error fetching artworks:', error);
       setErrorMessage(error.message || 'Failed to fetch arts!');
@@ -62,8 +73,13 @@ function App() {
     setLoading(false);
   };
 
+  const handleMedium = (medium) => {
+    setActiveMedium(medium);
+    fetchArts(medium, true);
+  }
+
   useEffect(() => {
-    fetchArts(searchQueryDebounced);
+    fetchArts(searchQueryDebounced, false);
   }, [searchQueryDebounced]);
 
   return (
@@ -71,10 +87,12 @@ function App() {
       <h1 className='text-2xl font-bold mb-4 text-black'>Art Vault</h1>
       <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <div className='flex flex-wrap gap-2 mb-4'>
-        {Mediums.map(medium => (
-            <div className='border p-2'>
-              <h3>{medium}</h3>
-            </div>
+        {Mediums.map((medium, index) => (
+          <div key={index} className={`border p-2 cursor-pointer ${medium === activeMedium ? 'bg-black text-white' : ''}`}
+            onClick={() => handleMedium(medium)}
+          >
+            <h3>{medium}</h3>
+          </div>
         ))}
       </div>
       {loading ? <p className='max-w-4xl mx-auto'>Loading...</p> : errorMessage ? (
