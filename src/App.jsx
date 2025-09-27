@@ -5,6 +5,8 @@ import Search from './components/Search';
 import Card from './components/Card';
 import Spinner from './components/Spinner';
 import Medium from './components/Medium';
+import Footer from './components/Footer';
+import Pagination from './components/Pagination';
 
 const API_BASE_URL = 'https://api.artic.edu/api/v1/artworks';
 
@@ -14,6 +16,10 @@ function App() {
   const [artworks, setArtworks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [hasPrevPage, setHasPrevPage] = useState(false);
 
   const [mediums, setMediums] = useState([]);
   const [mediumsLoading, setMediumsLoading] = useState(false);
@@ -49,7 +55,7 @@ function App() {
     }
   };
 
-  const fetchArts = async (query = '', isMedium = false) => {
+  const fetchArts = async (query = '', isMedium = false, page = 1) => {
     setLoading(true);
     setErrorMessage('');
     setArtworks([]);
@@ -59,7 +65,7 @@ function App() {
     }
 
     try {
-      let endpoint = query ? `${API_BASE_URL}/search?q=${encodeURIComponent(query)}&limit=10&fields=id,title,image_id` : `${API_BASE_URL}`;
+      const endpoint = query ? `${API_BASE_URL}/search?q=${encodeURIComponent(query)}&limit=24&page=${page}&fields=id,title,image_id` : `${API_BASE_URL}?page=${page}&limit=24&fields=id,title,image_id`;
 
       const response = await fetch(endpoint);
 
@@ -76,6 +82,11 @@ function App() {
       const filterDataByImage = (data.data).filter(art => art.image_id);
 
       setArtworks(filterDataByImage || []);
+
+      setTotalPages(Math.ceil(data.pagination.total / data.pagination.limit));
+      setCurrentPage(data.pagination.current_page);
+      setHasNextPage(data.pagination.current_page < data.pagination.total_pages);
+      setHasPrevPage(data.pagination.current_page > 1);
     } catch (error) {
       console.error('Error fetching artworks:', error);
       setErrorMessage(error.message || 'Failed to fetch arts!');
@@ -89,6 +100,25 @@ function App() {
     fetchArts(medium, true);
   }
 
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1) {
+      setCurrentPage(newPage);
+      fetchArts(searchQueryDebounced || activeMedium, !!activeMedium, newPage);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (hasPrevPage) {
+      handlePageChange(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (hasNextPage) {
+      handlePageChange(currentPage + 1);
+    }
+  };
+
   useEffect(() => {
     fetchArts(searchQueryDebounced, false);
   }, [searchQueryDebounced]);
@@ -98,6 +128,7 @@ function App() {
   }, []);
 
   return (
+    <>
     <main className='bg-ivory text-gray-800 min-h-screen pb-10'>
 
       <div className='pattern' />
@@ -121,15 +152,23 @@ function App() {
         ) : errorMessage ? (
           <h2 className='font-bold font-lora text-red-500 text-center text-sm sm:text-base md:text-lg'>{errorMessage}</h2>
         ) : (
-          <div className='columns-1 xs:columns-2 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-4 2xl:columns-4 gap-2 sm:gap-3 md:gap-4'>
-            {artworks.map((art) => (
-              <Card key={art.id} art={art} />
-            ))}
-          </div>
+          <>
+            <div className='columns-1 xs:columns-2 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-4 2xl:columns-4 gap-2 sm:gap-3 md:gap-4'>
+              {artworks.map((art) => (
+                <Card key={art.id} art={art} />
+              ))}
+            </div>
+            {artworks.length > 0 && (
+              <Pagination currentPage={currentPage} totalPages={totalPages} hasNextPage={hasNextPage} hasPrevPage={hasPrevPage} handleNextPage={handleNextPage} handlePrevPage={handlePrevPage} />
+            )}
+          </>
         )}
 
       </div>
     </main>
+    
+    <Footer />
+    </>
   );
 }
 
