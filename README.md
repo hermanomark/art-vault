@@ -1,12 +1,50 @@
-# React + Vite
+# Art Vault
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A beautiful React application for exploring artworks from the Art Institute of Chicago. Browse through a curated collection of art pieces with search functionality and medium filtering.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🎨 Browse artworks from the Art Institute of Chicago
+- 🔍 Search functionality with debounced input
+- 🎭 Filter by art mediums
+- 📱 Responsive design with masonry layout
+- 📄 Pagination support
+- ⚡ Fast loading with Vite
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **React** - UI framework
+- **Vite** - Build tool and development server
+- **Tailwind CSS** - Styling
+- **Art Institute of Chicago API** - Data source
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (version 16 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <your-repo-url>
+cd art-vault
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npm run dev
+```
+
+4. Open your browser and visit `http://localhost:5173`
+
+## API
+
+This project uses the [Art Institute of Chicago API](https://api.artic.edu/docs/) to fetch artwork data.

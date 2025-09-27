@@ -1,4 +1,3 @@
-
 const Header = () => {
   return (
     <header className='text-center mb-8 sm:mb-10 md:mb-12'>
