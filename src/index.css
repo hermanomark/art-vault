@@ -9,11 +9,11 @@
 
 @theme {
  --font-crimson-text: "Crimson Text", serif;
- --font-playfair-display: "Playfair Display", serif;
+ --font-playfair-display: "Playfair Display", sans-serif;
  --font-inter: "Inter", sans-serif;
  --font-cormorant-garamond: "Cormorant Garamond", serif;
  --font-poppins: "Poppins", sans-serif;
- --font-lora: "Lora", serif;
+ --font-lora: "Lora", sans-serif;
  --color-ivory: #F8F5E4;
  --color-gold: #D4AF37;
 }
