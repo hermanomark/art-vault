@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useDebounce } from 'react-use';
 import Header from './components/Header';
 import Search from './components/Search';
-import Card from './components/Card';
+import ArtCard from './components/ArtCard';
+import ArtModal from './components/ArtModal';
 import Spinner from './components/Spinner';
 import Medium from './components/Medium';
 import Footer from './components/Footer';
@@ -24,6 +25,8 @@ function App() {
   const [mediums, setMediums] = useState([]);
   const [mediumsLoading, setMediumsLoading] = useState(false);
   const [activeMedium, setActiveMedium] = useState('');
+
+  const [selectedArtworkId, setSelectedArtworkId] = useState(null);
 
   useDebounce(() => setSearchQueryDebounced(searchQuery), 640, [searchQuery]);
 
@@ -49,7 +52,6 @@ function App() {
       setMediums(uniqueMaterials || []);
     } catch (error) {
       console.error('Error fetching material titles:', error);
-      return [];
     } finally {
       setMediumsLoading(false);
     }
@@ -65,7 +67,7 @@ function App() {
     }
 
     try {
-      const endpoint = query ? `${API_BASE_URL}/search?q=${encodeURIComponent(query)}&limit=24&page=${page}&fields=id,title,image_id` : `${API_BASE_URL}?page=${page}&limit=24&fields=id,title,image_id`;
+      const endpoint = query ? `${API_BASE_URL}/search?q=${encodeURIComponent(query)}&limit=24&page=${page}&fields=id,title,artist_title,image_id` : `${API_BASE_URL}?page=${page}&limit=24&fields=id,title,artist_title,image_id`;
 
       const response = await fetch(endpoint);
 
@@ -99,6 +101,14 @@ function App() {
     setActiveMedium(medium);
     fetchArts(medium, true);
   }
+
+  const handleArtworkClick = (artworkId) => {
+    setSelectedArtworkId(artworkId);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedArtworkId(null);
+  };
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1) {
@@ -155,7 +165,7 @@ function App() {
           <>
             <div className='columns-1 xs:columns-2 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-4 2xl:columns-4 gap-2 sm:gap-3 md:gap-4'>
               {artworks.map((art) => (
-                <Card key={art.id} art={art} />
+                <ArtCard key={art.id} art={art} onArtworkClick={handleArtworkClick}  />
               ))}
             </div>
             {artworks.length > 0 && (
@@ -168,6 +178,8 @@ function App() {
     </main>
     
     <Footer />
+
+    <ArtModal artworkId={selectedArtworkId} onClose={handleCloseModal} />
     </>
   );
 }

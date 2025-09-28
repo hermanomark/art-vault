@@ -5,7 +5,7 @@ const Pagination = ({ currentPage, totalPages, hasNextPage, hasPrevPage, handleN
       <button
         onClick={handlePrevPage}
         disabled={!hasPrevPage}
-        className={`font-lora cursor-pointer px-4 py-2 rounded-lg font-medium transition-colors ${hasPrevPage
+        className={`font-lora cursor-pointer px-4 py-2 font-medium transition-colors ${hasPrevPage
           ? 'bg-gray-800 text-white hover:bg-gray-700'
           : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
@@ -20,7 +20,7 @@ const Pagination = ({ currentPage, totalPages, hasNextPage, hasPrevPage, handleN
       <button
         onClick={handleNextPage}
         disabled={!hasNextPage}
-        className={`font-lora cursor-pointer px-4 py-2 rounded-lg font-medium transition-colors ${hasNextPage
+        className={`font-lora cursor-pointer px-4 py-2 font-medium transition-colors ${hasNextPage
           ? 'bg-gray-800 text-white hover:bg-gray-700'
           : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}

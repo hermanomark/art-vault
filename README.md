@@ -1,22 +1,13 @@
 # Art Vault
 
-A beautiful React application for exploring artworks from the Art Institute of Chicago. Browse through a curated collection of art pieces with search functionality and medium filtering.
+A web-application for exploring artworks from the Art Institute of Chicago. Browse through a curated collection of art pieces.
 
 ## Features
 
-- 🎨 Browse artworks from the Art Institute of Chicago
-- 🔍 Search functionality with debounced input
-- 🎭 Filter by art mediums
-- 📱 Responsive design with masonry layout
-- 📄 Pagination support
-- ⚡ Fast loading with Vite
-
-## Tech Stack
-
-- **React** - UI framework
-- **Vite** - Build tool and development server
-- **Tailwind CSS** - Styling
-- **Art Institute of Chicago API** - Data source
+- Browse artworks from the Art Institute of Chicago
+- Search functionality
+- Filter by art mediums
+- Responsive design
 
 ## Getting Started
 
